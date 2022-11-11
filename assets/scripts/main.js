@@ -54,6 +54,17 @@ function initializeServiceWorker() {
   // B5. TODO - In the event that the service worker registration fails, console
   //            log that it has failed.
   // STEPS B6 ONWARDS WILL BE IN /sw.js
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then((registration) => {
+        console.log('Service worker registration succeeded:', registration);
+      }, (error) => {
+        console.error(`Service worker registration failed: ${error}`);
+      });
+    });
+  } else {
+    console.error('Service workers are not supported');
+  }
 }
 
 /**
@@ -100,6 +111,30 @@ async function getRecipes() {
   //            resolve() method.
   // A10. TODO - Log any errors from catch using console.error
   // A11. TODO - Pass any errors to the Promise's reject() function
+
+  const localRecipes = localStorage.getItem("recipes");
+  if(localRecipes != null) {
+    return JSON.parse(localRecipes);
+  }
+
+  let fetchedRecipes = []
+  return new Promise(async (resolve, reject) => {
+    RECIPE_URLS.forEach(async (recipeURL) => {
+      try {
+        const recipeData = await fetch(recipeURL);
+        const recipeDataJSON = await recipeData.json();
+        fetchedRecipes.push(recipeDataJSON);
+        
+        if (fetchedRecipes.length == RECIPE_URLS.length) {
+          saveRecipesToStorage(fetchedRecipes);
+          resolve(fetchedRecipes);
+        }
+      } catch (err) {
+        console.error(err);
+        reject(err);
+      }
+    });
+  });
 }
 
 /**
