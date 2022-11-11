@@ -56,7 +56,7 @@ function initializeServiceWorker() {
   // STEPS B6 ONWARDS WILL BE IN /sw.js
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then((registration) => {
+      navigator.serviceWorker.register('/cse110-lab7/sw.js').then((registration) => {
         console.log('Service worker registration succeeded:', registration);
       }, (error) => {
         console.error(`Service worker registration failed: ${error}`);
